@@ -13,6 +13,8 @@ struct ContentView: View {
     @State private var showingScore = false
     @State private var scoreTitle = ""
     @State private var scoreValue = 0
+    @State private var newGameAlert = false
+    @State private var currentQuestionCount = 0
     var body: some View {
         ZStack {
             RadialGradient(stops: [
@@ -63,21 +65,37 @@ struct ContentView: View {
         } message: {
             Text("Your score is \(scoreValue)")
         }
+        .alert("Great game!", isPresented: $newGameAlert) {
+            Button("Reset", action: reset)
+        } message: {
+            Text("Total score: \(scoreValue)")
+        }
         
     }
     func flagTapped(_ number: Int) {
+        
         if number == correctAnswer {
             scoreTitle = "Correct"
             scoreValue += 1
         } else {
             scoreTitle = "Wrong, thats \(countries[number])"
         }
-
-        showingScore = true
+        currentQuestionCount += 1
+        if currentQuestionCount == 3 {
+            newGameAlert = true
+        } else {
+            showingScore = true
+            
+        }
     }
     func askQuestion() {
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
+    }
+    func reset() {
+        scoreValue = 0
+        currentQuestionCount = 0
+        askQuestion()
     }
 }
 
